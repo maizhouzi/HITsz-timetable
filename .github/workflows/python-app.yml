@@ -1,0 +1,55 @@
+name: Auto Report Daily
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 15 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Start EasyConnect docker
+        shell: bash
+        run: |
+          touch ~/.easyconn
+          echo -e "https://vpn.hitsz.edu.cn\n${{ secrets.username }}\n${{ secrets.password }}" > setting.conf
+          docker run --device /dev/net/tun --name 'EasyConnect' --cap-add NET_ADMIN -i -v $HOME/.easyconn:/root/.easyconn -p 127.0.0.1:1080:1080 -e EC_VER=7.6.7 hagb/docker-easyconnect:cli < setting.conf &
+          sleep 30
+          docker run --device /dev/net/tun --name 'Contingency' --cap-add NET_ADMIN -i -v $HOME/.easyconn:/root/.easyconn -p 127.0.0.1:2080:1080 -e EC_VER=7.6.7 hagb/docker-easyconnect:cli < setting.conf &
+          sleep 30
+
+      - uses: actions/checkout@v2
+      - name: Set up Python environment
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Python dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+          pip install pysocks
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Check VPN status
+        shell: bash
+        run: |
+          docker container ls
+          echo -e "\n=== EasyConnect ===\n"
+          docker container logs EasyConnect
+          echo -e "\n=== Contingency ===\n"
+          docker container logs Contingency
+
+      - name: Run daily report script
+        shell: bash
+        env:
+          USERNAME: ${{ secrets.username }}
+          PASSWORD: ${{ secrets.password }}
+          YEAR: ${{ secrets.year }}
+          MONTH: ${{ secrets.month}}
+          DAY: ${{ secrets.day}}
+        run: |
+          python main.py -u "$USERNAME" -y "$YEAR" -m "$MONTH" -d "$DAY" -p "$PASSWORD" -f kcb1.ics
+

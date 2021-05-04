@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from interface import cmdInput, config, icalOutput
-from excelParser import processExcel
+from excelParser import ProcessExcel
 from crawler import excelCrawler
 
 import click
@@ -14,7 +14,7 @@ def main():
     excelCrawler.login(form_url, form_inputs)
     excelRawBytes = excelCrawler.getExcelRawData()
 
-    cal_name, cal_data = processExcel.process(excelRawBytes)
+    cal_name, cal_data = ProcessExcel.process(excelRawBytes)
     icalOutput.output(cal_name, cal_data)
 
 
@@ -46,11 +46,18 @@ def main():
     '--stdout',
     help="Write iCalendar file content to stdout, this will override --filepath option",
     is_flag=True)
+@staticmethod
+def set_vpn_port(port):
+    socks5 = f"socks5h://127.0.0.1:{port}"
+    proxies = {"http": socks5, "https": socks5}
+    return proxies
+
 def execute(username, password, filepath, y, m, d, stdout):
     cmdInput.parseLoginParams(username, password)
     cmdInput.parseStartDate(y, m, d)
     cmdInput.parseOutputTarget(filepath, stdout)
     main()
+
 
 
 if __name__=="__main__":
