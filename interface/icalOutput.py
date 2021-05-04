@@ -30,7 +30,7 @@ def output(cal_name, cal_data):
                     thisClass["uid"] = \
                         start_datetime.strftime("%Y%m%dT%H%M%S") +\
                         "w" + str(week) +\
-                        "@" + config.CrawlerParams.username
+                        "@" + "课表"
 
                     ical.add_component(thisClass)
             except:
