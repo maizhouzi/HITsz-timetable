@@ -1,4 +1,4 @@
-name: Auto Report Daily
+name: Auto Download calendar
 
 on:
   workflow_dispatch:
@@ -31,7 +31,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install requests
           pip install pysocks
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install icalendar
+          pip install click
+          pip install bs4
+          pip install openpyxl
 
       - name: Check VPN status
         shell: bash
