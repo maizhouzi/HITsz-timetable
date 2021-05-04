@@ -22,6 +22,9 @@ sess.headers.update({
     "Accept-Language": "zh-CN,zh;q=0.9"
 })
 
+socks5 = f"socks5h://127.0.0.1:1080"
+proxies1 = {"http": socks5, "https": socks5}
+
 
 # GET login page, in order to:
 # - generates all input param of the login form
@@ -31,7 +34,7 @@ sess.headers.update({
 # - URL of form action page
 # - ALL website default input key-values
 def get_text() -> typing.Tuple[str, dict]:
-    response = sess.get(config.URLs.login_page)
+    response = sess.get(config.URLs.login_page,proxies=proxies1)
     if response.status_code != 200:
         raise CrawlerError("Get Login Page: Server responded error code" + str(response.status_code) + ".")
 
@@ -58,7 +61,7 @@ def login(loginFormPage, allLoginParams):
 
     # Login!
     # Get a validated COOKIE for our session.
-    response = sess.post(config.URLs.login_domain + loginFormPage, params=allLoginParams)
+    response = sess.post(config.URLs.login_domain + loginFormPage, params=allLoginParams,proxies=proxies1)
 
     if response.status_code != 200:
         raise CrawlerError("Login: Server responded error code: " + str(response.status_code) + ".")
@@ -67,7 +70,7 @@ def login(loginFormPage, allLoginParams):
 
 
 def getExcelRawData() -> bytes:
-    response = sess.post(config.URLs.uid_query)
+    response = sess.post(config.URLs.uid_query,proxies=proxies1)
     if response.status_code!=200:
         raise CrawlerError("Query User UID: Server responded error code" + str(response.status_code) + ".")
     try:
@@ -90,7 +93,7 @@ def getExcelRawData() -> bytes:
 E4%B8%BB%E9%A1%B5%E8%AF%BE%E8%A1%A8%E5%AF%BC%E5%87%BA.cpt%22%2C%22xn%22%3A%22""" + year + """%22%2C\
 %22xq%22%3A%22""" + str(smcount) + "%22%2C%22dm%22%3A%22" + UID + "%22%7D%5D"
 
-    response = sess.post(config.URLs.excel_export, params=excel_params)
+    response = sess.post(config.URLs.excel_export, params=excel_params,proxies=proxies1)
     if response.status_code != 200:
         raise CrawlerError("Get Excel: Server responded error code" + response.status_code + ".")
     elif response.headers["content-type"].find("excel")==-1 and\

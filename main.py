@@ -41,11 +41,7 @@ def main():
     help=
     "Write iCalendar file content to stdout, this will override --filepath option",
     is_flag=True)
-@staticmethod
-def set_vpn_port(port):
-    socks5 = f"socks5h://127.0.0.1:{port}"
-    proxies = {"http": socks5, "https": socks5}
-    return proxies
+
 
 
 def execute(username, password, filepath, y, m, d, stdout):
