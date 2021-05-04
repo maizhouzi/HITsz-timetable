@@ -1,0 +1,5 @@
+requests
+icalendar
+click
+bs4
+openpyxl

@@ -42,7 +42,7 @@ jobs:
           echo -e "\n=== Contingency ===\n"
           docker container logs Contingency
 
-      - name: Run daily report script
+      - name: Run Calendar
         shell: bash
         env:
           USERNAME: ${{ secrets.username }}
