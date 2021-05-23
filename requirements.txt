@@ -3,3 +3,4 @@ icalendar
 click
 bs4
 openpyxl
+pysocks

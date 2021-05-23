@@ -7,6 +7,7 @@ from crawler import excelCrawler
 import click
 import misc
 import datetime
+import pysocks
 # import genIcs
 
 
