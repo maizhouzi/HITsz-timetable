@@ -38,9 +38,12 @@ class Report(object):
     def start_new_session(self):
         sess = requests.session()
         sess.headers.update({
-            'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 '
-            '(KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36'
+            "Connection": "keep-alive",
+            "Cache-Control": "max-age=0",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:88.0) Gecko/20100101 Firefox/88.0",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+            "Accept-Encoding": "gzip, deflate, br",
+            "Accept-Language": "zh-CN,zh;q=0.9"
         })
         self.session = sess
 
@@ -84,6 +87,8 @@ class Report(object):
                                str(response.status_code) + ".")
         elif response.text.find("账号密码验证失败") != -1:
             raise CrawlerError("Login: Incorrect username or password.")
+        if response.status_code == 200:
+            logging.info(f"认证系统登录成功。")
 
     def getExcelRawData(self) -> bytes:
         response = self.session.post(config.URLs.uid_query,
@@ -91,6 +96,8 @@ class Report(object):
         if response.status_code != 200:
             raise CrawlerError("Query User UID: Server responded error code" +
                                str(response.status_code) + ".")
+        if response.status_code == 200:
+            logging.info(f"下载excel成功。")
         try:
             j = json.loads(response.text)
             UID = j["ID"]
