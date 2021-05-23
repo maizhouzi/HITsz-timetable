@@ -30,7 +30,7 @@ def main():
         if r.proxy_on:
             logging.error(err)
             wait_a_minute("开启代理，将在 {} 秒后重试。")
-            r.switch_proxies(r.student_login)
+            r.switch_proxies(r.login(form_url, form_inputs))
         else:
             raise err
     excelRawBytes = r.getExcelRawData()
