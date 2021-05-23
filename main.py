@@ -19,21 +19,13 @@ def main():
         wait = 60 * extra_minutes + random.randint(0, 60)
         logging.warning(prompt.format(wait))
         time.sleep(wait)
-    r = excelCrawler.Report(proxy_on=1, ports=[1080, 2080])
+    r = excelCrawler.Report(proxy_on=True, ports=[1080, 2080])
     form_url, form_inputs = r.get_text()
-    form_url, form_inputs = r.login(form_url, form_inputs)
-    excelCrawler.login(form_url, form_inputs)
-    excelRawBytes = excelCrawler.getExcelRawData()
-
-    cal_name, cal_data = ProcessExcel.process(excelRawBytes)
-    cal_name = "你的课表"
-    icalOutput.output(cal_name, cal_data)
-
     try:
-        r.student_login()
+        r.login(form_url, form_inputs)
     except excelCrawler.ReportException.LoginError:
         wait_a_minute("登录失败，将在 {} 秒后重试。", 1)
-        r.login()
+        r.login(form_url, form_inputs)
     except Exception as err:
         if r.proxy_on:
             logging.error(err)
@@ -41,6 +33,13 @@ def main():
             r.switch_proxies(r.student_login)
         else:
             raise err
+    excelRawBytes = r.getExcelRawData()
+
+    cal_name, cal_data = ProcessExcel.process(excelRawBytes)
+    cal_name = "你的课表"
+    icalOutput.output(cal_name, cal_data)
+
+
 
 
 @click.command()
